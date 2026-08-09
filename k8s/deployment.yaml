@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hcdevkit-portal
+  namespace: huaweicloud-agent
+  labels:
+    app: hcdevkit-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hcdevkit-portal
+  template:
+    metadata:
+      labels:
+        app: hcdevkit-portal
+    spec:
+      containers:
+        - name: server
+          image: swr.cn-south-1.myhuaweicloud.com/huaweicloud-agent/hcdevkit-portal:20260810002151
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: mysql
+            - name: SPRING_DATASOURCE_HOST
+              value: "10.0.1.242"
+            - name: SPRING_DATASOURCE_PORT
+              value: "3306"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+                  optional: true
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+                  optional: true
+            - name: SPRING_REDIS_HOST
+              value: "10.0.1.53"
+            - name: SPRING_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SPRING_REDIS_PASSWORD
+                  optional: true
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: GITHUB_TOKEN
+                  optional: true
+            - name: INGEST_TOKEN
+              value: hcdevkit-portal-ingest-token-v1
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /rest/developer/server/hcdevkitportal/v1/metrics/stars
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /rest/developer/server/hcdevkitportal/v1/metrics/stars
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+      imagePullSecrets:
+        - name: swr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hcdevkit-portal
+  namespace: huaweicloud-agent
+spec:
+  selector:
+    app: hcdevkit-portal
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP
