@@ -19,7 +19,7 @@ public class NpmSyncTask {
 
     private static final Logger log = LoggerFactory.getLogger(NpmSyncTask.class);
     private static final String NPM_API =
-            "https://api.npmjs.org/downloads/point/last-month/@anthropic/claude-code";
+            "https://api.npmjs.org/downloads/point/last-month/huaweicloud-devkit";
 
     private final MetricSnapshotRepository repo;
     private final RestTemplate restTemplate;

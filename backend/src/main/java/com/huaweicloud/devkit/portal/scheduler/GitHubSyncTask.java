@@ -20,7 +20,7 @@ import java.util.Map;
 public class GitHubSyncTask {
 
     private static final Logger log = LoggerFactory.getLogger(GitHubSyncTask.class);
-    private static final String GITHUB_API = "https://api.github.com/repos/huaweicloud-mate/huaweicloud-devkit";
+    private static final String GITHUB_API = "https://api.github.com/repos/huaweicloud/HuaweiCloud-Devkit";
 
     private final MetricSnapshotRepository repo;
     private final RestTemplate restTemplate;
